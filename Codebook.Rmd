@@ -1,39 +1,143 @@
 ---
 title: "Codebook"
-output: github_document
+output:
+  github_document:
+    toc: true
+    toc_depth: 3
+
+
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(xlsx)
+library(rmarkdown)
+library(knitr)
+
+# Transfer dataset from e: to github repository
+
+Salzberg.raw <- read.csv(file="E:/01 Projekte/MUBS_FWF/A-Arbeiten/02_Datenverarbeitung/Python/Salzberg_Edit/Fertige_Ergebnisse/SZBG_Aufgefaltet.csv", header=TRUE, sep=";", stringsAsFactors = FALSE)
+
+salzberg <- data.frame(Salzberg.raw$GESID, Salzberg.raw$BEZ, Salzberg.raw$BEZ_HEUTE, Salzberg.raw$STR.1928, Salzberg.raw$STR.2018, Salzberg.raw$HNR, Salzberg.raw$ORIG_ADR, Salzberg.raw$NEU_ADR, Salzberg.raw$HPOS, Salzberg.raw$FL, Salzberg.raw$STKWK, Salzberg.raw$BJ, Salzberg.raw$KJ, Salzberg.raw$ORIG, Salzberg.raw$PDF)
+salzberg[] <- lapply(salzberg, function(x) if (is.factor(x)) as.character(x) else {x})
+
+
+colnames(salzberg) <- c("ID", "UD.1920s", "UD.2010s", "STR.1920s", "STR.2010s", "BN.1920s", "ADR.1920s", "ADR.2010s", "POS.1920s", "AREA.1920s", "FLOORS.1920s", "YoC.1920s", "YoP.1920s", "Page.orig", "Page.pdf")
+
+write.table(salzberg, file = "C:/Users/u.kral/ownCloud/03_TU Wien/R/building.registry/Dataset.csv",  row.names = FALSE, sep = ";", dec = ".", fileEncoding = "UTF-8")
+
+
+# Import dataset
+dataset <- read.table("Dataset.csv", sep = ";", header = TRUE, encoding="UTF-8")
+
+
+# Import tables and figures
+table1 <- read.table("Codebook_files/table_dataset.datafields.csv", sep = ";", header = TRUE, encoding="UTF-8")
+colnames(table1) <- c("Field", "Name", "Name.analog", "Description", "Type")
+
+table_id <- read.table("Codebook_files/table_ID.csv", sep = ";", header = TRUE, encoding="UTF-8")
+#colnames(table1) <- c("Field", "Name", "Name.analog", "Description", "Type")
+
+table_STR.2010s <- read.table("Codebook_files/table_STR.2010s.csv", sep = ";", header = TRUE, encoding="UTF-8")
+
+table_ADR.1920s <- read.table("Codebook_files/table_ADR.1920s.csv", sep = ";", header = TRUE, encoding="UTF-8")
+
+table_ADR.2010s <- read.table("Codebook_files/table_ADR.2010s.csv", sep = ";", header = TRUE, encoding="UTF-8")
+
+table_POS.1920s <- read.table("Codebook_files/table_POS.1920s.csv", sep = ";", header = TRUE, encoding="UTF-8")
+
+table_FLOORS.1920s <- read.table("Codebook_files/table_FLOORS.1920s.csv", sep = ";", header = TRUE, encoding="UTF-8")
 ```
 
-## Introduction
-This Codebook refers to the dataset “Building registry of Vienna in the late 1920s”, briefly called digital building registry. The digital building registry is the machine-readable version of [Häuser-Kataster der Bundeshauptstadt Wien](https://permalink.obvsg.at/wbr/AC07637508). The transformation from the analog to the digital version is documented by a Data Descriptor, published in Nature Scientific Data.
 
-##	Dataset format
+# Introduction
+This Codebook refers to the dataset [Building registry of Vienna in the late 1920s](Dataset.csv), briefly called digital building registry.
+
+#	Dataset format
 The dataset has a CSV format. The data records are separated by semicolons (“;”). The decimal separator is a decimal point “.”. The Universal Coded Character Set (UCS) is UTF-8. 
 
-##	Dataset fields
-The dataset includes 15 fields, as listed below. It includes fields from the analog building registry, briefly called original data (OD) and supplementary data (SD), which have been added to improve data processing and validation as well as usability. It is noted that the analog building registry consists of [ten volumes](Codebook_files/table_volumes.analog.building.registry.csv), which have been published between 1927 and 1930. So, we attached a “.1920s” to these database fields. The “.2010s” addition indicates that the timestamp is in the late 2010s – between 2018 and 2019.
+#	Dataset fields
+The dataset includes `r nrow(table1)` fields, as listed below. It includes fields from the analog building registry, briefly called original data (OD) and supplementary data (SD), which have been added to improve data processing and validation as well as usability. It is noted that the analog building registry consists of [ten volumes](Codebook_files/table_volumes.analog.building.registry.csv), which have been published between 1927 and 1930. So, we attached a “.1920s” to dataset fields that originate from the analog building registry. The “.2010s” addition indicate that the timestamp is in the late 2010s – between 2018 and 2019.
 
-## Comments
-This section comments on the individual data fields by giving background information and details for using the data.
+```{r, echo=FALSE}
+kable(head(table1,nrow(table1)))
 
-###	ID
-It is noted that the analog building registry has entries with multiple building numbers per entry. These entries have been separated to have only a single building number per data entry.
-The field “ID” is a character that stands for a unique address. An address is the combination of the street name and the building number.
-The next figure exemplifies the address relation between the analog and the digital building registry.
-
-[test](Codebook_files/table_codebook.table.csv)
-
-
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# Comments
+This section comments on the individual data fields by giving background information and details for using the data.
+
+##	ID
+It is noted that the analog building registry has entries with multiple building numbers per entry. These entries have been separated to have only a single building number per data entry.
+
+The field “ID” is a character that stands for a unique address. An address is the combination of the street name and the building number.
+The next figure exemplifies the address relation between the analog and the digital building registry. For instance, the address "lerchenfelderstraße 100,102" is converted into the following data entries:
+
+```{r, echo=FALSE}
+kable(head(table_id))
+
+```
+
+## UD.1920s
+The field specifies the urban district in which the building is located in the late 1920s. It is noted that the district boundaries differ from those in the late 2010s. It is also stated that in the late 1920s the city covered only the districts 1 to 21. The districts 22 and 23 were amalgamated with the city after the 1920s.
+
+## UD.2010s
+The field specifies the number of the urban district as given in the late 2010s. It is noted that the geospatial data on administrative boundaries of the city and the districts can be retrieved [online](https://www.data.gv.at/katalog/dataset/1a22d558-544a-46c1-95b9-baa77d2bb485).
+
+##	STR.1920s
+This field specifies the name of the street / square as given in the late 1920s.
+
+## STR.2010s
+This field species two type of entries.
+```{r, echo=FALSE}
+kable(head(table_STR.2010s))
+```
+
+##	BN.1920s
+The field specifies the number of a building in a street as given in 1928. An empty cell indicates no data record.
+
+##	ADR.1920s
+This field defines the address in the late 1920s.
+```{r, echo=FALSE}
+kable(head(table_ADR.1920s))
+```
+
+##	ADR.2010s
+This field combines the “STR.2010S” and the “BN.1920s”.
+```{r, echo=FALSE}
+kable(head(table_ADR.2010s))
+```
+
+##	POS.1920s
+The field specifies the position of the building within a row of buildings.
+```{r, echo=FALSE}
+kable(head(table_POS.1920s))
+```
+
+##	AREA.1920s
+The field lacks comments in the analog building registry [2]. We found evidence that the field area stands for the property area in m2 and not for the footprint of the buildings. “NA” stands for “not available”.
+
+##	FLOORS.1920s
+The field includes integers from “1” to “5”. We found evidence that “1” stands for ground floor (British English) or first floor (American English) plus an additional floor. Following this logic, buildings with just a ground floor have not been recorded in the analog building registry.
+```{r, echo=FALSE}
+kable(head(table_FLOORS.1920s))
+```
+
+##	YoC.1920s
+The field covers the year in which the building was constructed. Blank entries stand for “not available”.
+
+##	YoP.1920s
+The data field covers the year the building was transferred to the new owner. Blank entries stand for “not available”.
+
+##	Page.orig
+The page number as given on top of each page in the analog building registry. “NA” stands for “not available”.
+
+##	Page.pdf
+The field includes integers that stand for the page number in the scanned PDF version in the respective volume. It facilitates cross-referencing between the analog and the machine-readable version of the building registry. “NA” stands for “not available”.
+
+# Exemplary data records
+```{r, echo=FALSE}
+kable(head(dataset[1:5,]))
+```
+
+
