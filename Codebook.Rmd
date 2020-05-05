@@ -14,7 +14,7 @@ This Codebook refers to the dataset “Building registry of Vienna in the late 1
 The dataset has a CSV format. The data records are separated by semicolons (“;”). The decimal separator is a decimal point “.”. The Universal Coded Character Set (UCS) is UTF-8. 
 
 ##	Dataset fields
-The dataset includes 15 fields, as listed below. It includes fields from the analog building registry, briefly called original data (OD) and supplementary data (SD), which have been added to improve data processing and validation as well as usability. It is noted that the analog building registry consists of ten volumes, which have been published between 1927 and 1930 (online table: codebook_analog.building.registry.csv). So, we attached a “.1920s” to these database fields. The “.2010s” addition indicates that the timestamp is in the late 2010s – between 2018 and 2019.
+The dataset includes 15 fields, as listed below. It includes fields from the analog building registry, briefly called original data (OD) and supplementary data (SD), which have been added to improve data processing and validation as well as usability. It is noted that the analog building registry consists of [ten volumes](Codebook_files/table_volumes.analog.building.registry.csv), which have been published between 1927 and 1930. So, we attached a “.1920s” to these database fields. The “.2010s” addition indicates that the timestamp is in the late 2010s – between 2018 and 2019.
 
 ## Comments
 This section comments on the individual data fields by giving background information and details for using the data.
@@ -27,9 +27,6 @@ The next figure exemplifies the address relation between the analog and the digi
 [test](Codebook_files/table_codebook.table.csv)
 
 
-```{r cars}
-summary(cars)
-```
 
 ## Including Plots
 
