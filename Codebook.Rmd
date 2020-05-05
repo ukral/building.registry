@@ -2,7 +2,7 @@
 title: "Codebook"
 author: "Ulrich Kral"
 date: "5 5 2020"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
