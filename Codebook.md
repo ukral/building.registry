@@ -1,7 +1,7 @@
 Codebook
 ================
 
-# Introduction
+## Introduction
 
 This Codebook refers to the dataset “Building registry of Vienna in the
 late 1920s”, briefly called digital building registry. The digital
@@ -10,13 +10,13 @@ der Bundeshauptstadt Wien](https://permalink.obvsg.at/wbr/AC07637508).
 The transformation from the analog to the digital version is documented
 by a Data Descriptor, published in Nature Scientific Data.
 
-# Dataset format
+## Dataset format
 
 The dataset has a CSV format. The data records are separated by
 semicolons (“;”). The decimal separator is a decimal point “.”. The
 Universal Coded Character Set (UCS) is UTF-8.
 
-# Dataset fields
+## Dataset fields
 
 The dataset includes 15 fields, as listed below. It includes fields from
 the analog building registry, briefly called original data (OD) and
@@ -28,12 +28,12 @@ codebook\_analog.building.registry.csv). So, we attached a “.1920s” to
 these database fields. The “.2010s” addition indicates that the
 timestamp is in the late 2010s – between 2018 and 2019.
 
-# Comments
+## Comments
 
 This section comments on the individual data fields by giving background
 information and details for using the data.
 
-## ID
+### ID
 
 It is noted that the analog building registry has entries with multiple
 building numbers per entry. These entries have been separated to have
@@ -42,6 +42,8 @@ character that stands for a unique address. An address is the
 combination of the street name and the building number. The next figure
 exemplifies the address relation between the analog and the digital
 building registry.
+
+[test](Codebook_files/table_codebook.table.csv)
 
 ``` r
 summary(cars)
