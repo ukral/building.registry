@@ -22,11 +22,11 @@ The dataset includes 15 fields, as listed below. It includes fields from
 the analog building registry, briefly called original data (OD) and
 supplementary data (SD), which have been added to improve data
 processing and validation as well as usability. It is noted that the
-analog building registry consists of ten volumes, which have been
-published between 1927 and 1930 (online table:
-codebook\_analog.building.registry.csv). So, we attached a “.1920s” to
-these database fields. The “.2010s” addition indicates that the
-timestamp is in the late 2010s – between 2018 and 2019.
+analog building registry consists of [ten
+volumes](Codebook_files/table_volumes.analog.building.registry.csv),
+which have been published between 1927 and 1930. So, we attached a
+“.1920s” to these database fields. The “.2010s” addition indicates
+that the timestamp is in the late 2010s – between 2018 and 2019.
 
 ## Comments
 
@@ -44,18 +44,6 @@ exemplifies the address relation between the analog and the digital
 building registry.
 
 [test](Codebook_files/table_codebook.table.csv)
-
-``` r
-summary(cars)
-```
-
-    ##      speed           dist       
-    ##  Min.   : 4.0   Min.   :  2.00  
-    ##  1st Qu.:12.0   1st Qu.: 26.00  
-    ##  Median :15.0   Median : 36.00  
-    ##  Mean   :15.4   Mean   : 42.98  
-    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
-    ##  Max.   :25.0   Max.   :120.00
 
 ## Including Plots
 
