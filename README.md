@@ -1,4 +1,5 @@
 # building.registry
+[![DOI](https://zenodo.org/badge/261487353.svg)](https://zenodo.org/badge/latestdoi/261487353)
 
 The building registry of Vienna in the late 1920s was knowledge base for real estate and finance business. At this time, the registry was published on paper. The  [Wienbibliothek im Rathaus](www.wienbibliothek.at) scanned the documents and distribute the [Häuser-Kataster der Bundeshauptstadt Wien](permalink.obvsg.at/wbr/AC07637508) online in PDF format. We converted the PDFs into a machine-readable format.
 
