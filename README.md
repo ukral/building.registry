@@ -1,7 +1,5 @@
 # building.registry
 
-The repository belongs to the Data Descriptor [Building registry of Vienna in the late 1920s](https://www.nature.com/sdata/)
-
 The repository includes:
 
 * [Dataset](Dataset.csv): Machine-readable version of [Häuser-Kataster der Bundeshauptstadt Wien](https://permalink.obvsg.at/wbr/AC07637508). The analog version encompasses [10 PDF documents](Codebook_files/table_volumes.analog.building.registry.csv)
