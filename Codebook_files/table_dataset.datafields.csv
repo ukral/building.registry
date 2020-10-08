@@ -1,16 +1,13 @@
 ﻿Field;Name(Eng);Name(Ger);Description;Type
 ID;Identification number;-;A unique number for each data entry.;SD
 UD.1920s;Urban district;-;The number of the city district in the late 1920s.;SD
-UD.2010s;Urban district;-;The number of the city district in in the late 2010s.;SD
+CC.2010s;Cadastral community;-;The number of the cadastral community in in the late 2010s.;SD
 STR.1920s;Street name;Gasse, Straße oder Platz;Name of alley, street, square in the late 1920s.;OD
 STR.2010s;Street name;-;Name of alley, street, square in the late 2010s.;SD
 BN.1920s;Building number;Orientierungsnummer;Street-based continuous numerating of buildings in the late 1920s.;OD
-ADR.1920s;Address;-;Street name and building number in the late 1920s.;OD
-ADR.2010s;Address;-;Address in the late 2010s if street name or building number have changed, otherwise identical with ADR.1920s;SD
 POS.1920s;Position;Eck- oder Mittelhaus;Position of the building, at the corner or in the middle of row of buildings in the late 1920s.;OD
 AREA.1920s;Area;Ausmaß in m2;Area of the property in m2 as recorded in the late 1920s.;OD
 FLOORS.1920;Floors;Stockwerke;Number of floors as recorded in the late 1920s.;OD
 YoC.1920s;Year of construction;Im Jahre erbaut;Year of construction as recorded in the late 1920s.;OD
 YoP.1920s;Year of purchase;Im Jahre erworben;Year of purchase as recorded in the late 1920s.;OD
-Page.orig;Page number;-;The page number as given at the top of each page in the analog building registry. It is noted that pages without addresses lack a page number.;SD
-Page.pdf;Page number;-;The number of the PDF page in the respective volume.;SD
+Page.pdf;Page number;-;The number of the PDF page in the respective volume of the analog building schematic.;SD

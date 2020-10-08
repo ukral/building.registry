@@ -7,25 +7,23 @@ Codebook
   - [Comments](#comments)
       - [ID](#id)
       - [UD.1920s](#ud.1920s)
-      - [UD.2010s](#ud.2010s)
+      - [CC.2010s](#cc.2010s)
       - [STR.1920s](#str.1920s)
       - [STR.2010s](#str.2010s)
       - [BN.1920s](#bn.1920s)
-      - [ADR.1920s](#adr.1920s)
-      - [ADR.2010s](#adr.2010s)
       - [POS.1920s](#pos.1920s)
       - [AREA.1920s](#area.1920s)
       - [FLOORS.1920s](#floors.1920s)
       - [YoC.1920s](#yoc.1920s)
       - [YoP.1920s](#yop.1920s)
-      - [Page.orig](#page.orig)
       - [Page.pdf](#page.pdf)
   - [Exemplary data records](#exemplary-data-records)
 
 # Introduction
 
-This Codebook refers to the dataset [Building registry of Vienna in the
-late 1920s](Dataset.csv), briefly called digital building registry.
+This Codebook refers to the dataset [Building schematic of Vienna in the
+late 1920s](Dataset.csv), briefly called digital building schematic. The
+dataset includes 42861 data entries (rows) and 12 data fields (columns).
 
 # Dataset format
 
@@ -35,34 +33,26 @@ Universal Coded Character Set (UCS) is UTF-8.
 
 # Dataset fields
 
-The dataset includes 15 fields, as listed below. It includes fields from
-the analog building registry, briefly called original data (OD) and
-supplementary data (SD), which have been added to improve data
-processing and validation as well as usability. It is noted that the
-analog building registry consists of [ten
-volumes](Codebook_files/table_volumes.analog.building.registry.csv),
-which have been published between 1927 and 1930. So, we attached a
-“.1920s” to dataset fields that originate from the analog building
-registry. The “.2010s” addition indicate that the timestamp is in the
-late 2010s – between 2018 and 2019.
+The dataset includes 12 data fields. Eight data fields originate from
+the analog building schematic, briefly called original data (OD) and
+four data fields that have been supplemented (SD). The suffixes “.1920s”
+and “.2010s” indicate data records in the late 1920s and late 2010s,
+respectively.
 
-| Field       | Name                  | Name.analog              | Description                                                                                                                                    | Type |
-| :---------- | :-------------------- | :----------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- | :--- |
-| ID          | Identification number | \-                       | A unique number for each data entry.                                                                                                           | SD   |
-| UD.1920s    | Urban district        | \-                       | The number of the city district in the late 1920s.                                                                                             | SD   |
-| UD.2010s    | Urban district        | \-                       | The number of the city district in in the late 2010s.                                                                                          | SD   |
-| STR.1920s   | Street name           | Gasse, Straße oder Platz | Name of alley, street, square in the late 1920s.                                                                                               | OD   |
-| STR.2010s   | Street name           | \-                       | Name of alley, street, square in the late 2010s.                                                                                               | SD   |
-| BN.1920s    | Building number       | Orientierungsnummer      | Street-based continuous numerating of buildings in the late 1920s.                                                                             | OD   |
-| ADR.1920s   | Address               | \-                       | Street name and building number in the late 1920s.                                                                                             | OD   |
-| ADR.2010s   | Address               | \-                       | Address in the late 2010s if street name or building number have changed, otherwise identical with ADR.1920s                                   | SD   |
-| POS.1920s   | Position              | Eck- oder Mittelhaus     | Position of the building, at the corner or in the middle of row of buildings in the late 1920s.                                                | OD   |
-| AREA.1920s  | Area                  | Ausmaß in m2             | Area of the property in m2 as recorded in the late 1920s.                                                                                      | OD   |
-| FLOORS.1920 | Floors                | Stockwerke               | Number of floors as recorded in the late 1920s.                                                                                                | OD   |
-| YoC.1920s   | Year of construction  | Im Jahre erbaut          | Year of construction as recorded in the late 1920s.                                                                                            | OD   |
-| YoP.1920s   | Year of purchase      | Im Jahre erworben        | Year of purchase as recorded in the late 1920s.                                                                                                | OD   |
-| Page.orig   | Page number           | \-                       | The page number as given at the top of each page in the analog building registry. It is noted that pages without addresses lack a page number. | SD   |
-| Page.pdf    | Page number           | \-                       | The number of the PDF page in the respective volume.                                                                                           | SD   |
+| Field       | Name                  | Name.analog              | Description                                                                                     | Type |
+| :---------- | :-------------------- | :----------------------- | :---------------------------------------------------------------------------------------------- | :--- |
+| ID          | Identification number | \-                       | A unique number for each data entry.                                                            | SD   |
+| UD.1920s    | Urban district        | \-                       | The number of the city district in the late 1920s.                                              | SD   |
+| CC.2010s    | Cadastral community   | \-                       | The number of the cadastral community in in the late 2010s.                                     | SD   |
+| STR.1920s   | Street name           | Gasse, Straße oder Platz | Name of alley, street, square in the late 1920s.                                                | OD   |
+| STR.2010s   | Street name           | \-                       | Name of alley, street, square in the late 2010s.                                                | SD   |
+| BN.1920s    | Building number       | Orientierungsnummer      | Street-based continuous numerating of buildings in the late 1920s.                              | OD   |
+| POS.1920s   | Position              | Eck- oder Mittelhaus     | Position of the building, at the corner or in the middle of row of buildings in the late 1920s. | OD   |
+| AREA.1920s  | Area                  | Ausmaß in m2             | Area of the property in m2 as recorded in the late 1920s.                                       | OD   |
+| FLOORS.1920 | Floors                | Stockwerke               | Number of floors as recorded in the late 1920s.                                                 | OD   |
+| YoC.1920s   | Year of construction  | Im Jahre erbaut          | Year of construction as recorded in the late 1920s.                                             | OD   |
+| YoP.1920s   | Year of purchase      | Im Jahre erworben        | Year of purchase as recorded in the late 1920s.                                                 | OD   |
+| Page.pdf    | Page number           | \-                       | The number of the PDF page in the respective volume of the analog building schematic.           | SD   |
 
 # Comments
 
@@ -71,21 +61,21 @@ information and details for using the data.
 
 ## ID
 
-It is noted that the analog building registry has entries with multiple
+It is noted that the analog building schematic has entries with multiple
 building numbers per entry. These entries have been separated to have
 only a single building number per data entry.
 
 The field “ID” is a character that stands for a unique address. An
 address is the combination of the street name and the building number.
 The next figure exemplifies the address relation between the analog and
-the digital building registry. For instance, the address
+the digital building schematic. For instance, the address
 “lerchenfelderstraße 100,102” is converted into the following data
 entries:
 
 | STR.1920s           | BN.1920s | ID       |
 | :------------------ | -------: | :------- |
-| lerchenfelderstraße |      100 | 10063\_0 |
-| lerchenfelderstraße |      102 | 10063\_1 |
+| lerchenfelderstraße |      100 | 11976\_0 |
+| lerchenfelderstraße |      102 | 11976\_1 |
 
 ## UD.1920s
 
@@ -95,49 +85,32 @@ those in the late 2010s. It is also stated that in the late 1920s the
 city covered only the districts 1 to 21. The districts 22 and 23 were
 amalgamated with the city after the 1920s.
 
-## UD.2010s
+## CC.2010s
 
-The field specifies the number of the urban district as given in the
-late 2010s. It is noted that the geospatial data on administrative
-boundaries of the city and the districts can be retrieved
-[online](https://www.data.gv.at/katalog/dataset/1a22d558-544a-46c1-95b9-baa77d2bb485).
+The field specifies a numerical code of the cadastral community as given
+in the late 2010s. It is noted that the geospatial data on
+administrative boundaries of the city can be retrieved from the Austrian
+[open government data
+plattform](https://www.data.gv.at/katalog/dataset/verwaltungsgrenzen-vgd-stichtagsdaten-wien).
 
 ## STR.1920s
 
-This field specifies the name of the street / square as given in the
-late 1920s.
+This field specifies the name of the street, alley or square as given in
+the late 1920s.
 
 ## STR.2010s
 
-This field species two type of entries.
+This field specifies two type of entries.
 
-| Entry                                          | Description                                                                                                                                                                          |
-| :--------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Respective name of the street / square / alley | This field specifies the name of the street / square / alley as given in the late 2010s. So, it respects possible changes in the naming of streets and squares since the late 1920s. |
-| Blank (“”)                                     | The name of the street / square / alley in the late 1920s does not exist in the late 2010s.                                                                                          |
+| Entry                                          | Description                                                                                                                                                                                    |
+| :--------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Respective name of the street, square or alley | This field specifies the name of the street, square or alley as given in the late 2010s. So, the dataset considers possible changes in the naming of streets and squares since the late 1920s. |
+| Blank (“”)                                     | The name of the street, square or alley in the late 1920s does not exist in the late 2010s.                                                                                                    |
 
 ## BN.1920s
 
 The field specifies the number of a building in a street as given in
-1928. An empty cell indicates no data record.
-
-## ADR.1920s
-
-This field defines the address in the late 1920s.
-
-| Entry              | Description                                             |
-| :----------------- | :------------------------------------------------------ |
-| Respective address | This field combines the “STR.1920s” and the “BN.1920s”. |
-| Blank (“”)         | The data entry indicates a lack of “BN.1920s”.          |
-
-## ADR.2010s
-
-This field combines the “STR.2010S” and the “BN.1920s”.
-
-| Entry              | Description                                                                                                                                                                                                                                                              |
-| :----------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Respective address | The address corresponds to ADR.1920s and has been verified by the address register of 2018. It is noted that the street name between ADR.2010S and ADR.1920S might be not identical because street name might have changed between the late 1920s and late 2010s.        |
-| Blank (“”)         | This indicates that the ADR.1920s could not be verified by an entry in the address register of the late 2010s. Geotagging the ADR.1920s needs to be done manually by screening historical literature. It is noted that addresses without “BN.1920s” are also left blank. |
+late 1920s. An empty cell indicates no data record.
 
 ## POS.1920s
 
@@ -153,26 +126,26 @@ buildings.
 
 ## AREA.1920s
 
-The field lacks comments in the analog building registry \[2\]. We found
-evidence that the field area stands for the property area in m2 and not
-for the footprint of the buildings. “NA” stands for “not available”.
+The field specifies the property area in m2. “NA” stands for “not
+available”.
 
 ## FLOORS.1920s
 
-The field includes integers from “1” to “5”. We found evidence that “1”
-stands for ground floor (British English) or first floor (American
-English) plus an additional floor. Following this logic, buildings with
-just a ground floor have not been recorded in the analog building
-registry.
+The meaning of blank records is ambiguous and is considered to be
+unknown unless additional efforts are undertaken to replace them by
+evidence-based data from historical construction plans. The integer
+floor numbers represent the floors above a ground floor and mezzanine
+with a lower base floor, respectively. So, a building with a data record
+“1” has two floors in total, one ground floor and one above.
 
-| Entry | Interpretation           |
-| ----: | :----------------------- |
-|    NA | No information available |
-|     1 | Two floors               |
-|     2 | Three floors             |
-|     3 | Four floors              |
-|     4 | Five floors              |
-|     5 | Six floors               |
+| Entry | Total.floor.count |
+| :---- | :---------------- |
+| blank | unknown           |
+| 1     | Two floors        |
+| 2     | Three floors      |
+| 3     | Four floors       |
+| 4     | Five floors       |
+| 5     | Six floors        |
 
 ## YoC.1920s
 
@@ -184,24 +157,18 @@ entries stand for “not available”.
 The data field covers the year the building was transferred to the new
 owner. Blank entries stand for “not available”.
 
-## Page.orig
-
-The page number as given on top of each page in the analog building
-registry. “NA” stands for “not available”.
-
 ## Page.pdf
 
 The field includes integers that stand for the page number in the
-scanned PDF version in the respective volume. It facilitates
-cross-referencing between the analog and the machine-readable version of
-the building registry. “NA” stands for “not available”.
+scanned PDF version of the [analog building
+schematic](permalink.obvsg.at/wbr/AC07637508).
 
 # Exemplary data records
 
-| ID  | UD.1920s | UD.2010s | STR.1920s                | STR.2010s                | BN.1920s | ADR.1920s     | ADR.2010s | POS.1920s | AREA.1920s | FLOORS.1920s | YoC.1920s | YoP.1920s | Page.orig | Page.pdf |
-| :-- | -------: | -------: | :----------------------- | :----------------------- | :------- | :------------ | :-------- | :-------- | ---------: | -----------: | :-------- | :-------- | --------: | -------: |
-| 1\_ |        1 |        1 | abrahamasanctaclaragasse | abrahamasanctaclaragasse |          |               |           |           |         NA |           NA |           |           |        NA |       NA |
-| 2\_ |        1 |        1 | adlergasse               |                          | 4        | adlergasse 4  |           | M         |    1063.73 |            5 | 1878      | 1924      |        11 |       15 |
-| 3\_ |        1 |        1 | adlergasse               |                          | 8        | adlergasse 8  |           | E         |     822.68 |            4 | 1892      | 1865      |        11 |       15 |
-| 4\_ |        1 |        1 | adlergasse               |                          | 10       | adlergasse 10 |           | M         |     314.21 |            5 | 1892      | 1900      |        11 |       15 |
-| 5\_ |        1 |        1 | adlergasse               |                          | 12       | adlergasse 12 |           | M         |     427.31 |            3 | 1911      | 1912      |        11 |       15 |
+| ID | UD.1920s | CC.2010s | STR.1920s                | BN.1920s | STR.2010s                | POS.1920s | AREA.1920s | FLOORS.1920s | YoC.1920s | YoP.1920s | Page.pdf |
+| :- | -------: | -------: | :----------------------- | :------- | :----------------------- | :-------- | ---------: | -----------: | :-------- | :-------- | -------: |
+| 1  |        1 |     1004 | abrahamasanctaclaragasse |          | abrahamasanctaclaragasse |           |         NA |           NA |           |           |       15 |
+| 2  |        1 |     1004 | adlergasse               | 4        |                          | M         |    1063.73 |            5 | 1878      | 1924      |       15 |
+| 3  |        1 |     1004 | adlergasse               | 8        |                          | E         |     822.68 |            4 | 1892      | 1865      |       15 |
+| 4  |        1 |     1004 | adlergasse               | 10       |                          | M         |     314.21 |            5 | 1892      | 1900      |       15 |
+| 5  |        1 |     1004 | adlergasse               | 12       |                          | M         |     427.31 |            3 | 1911      | 1912      |       15 |
