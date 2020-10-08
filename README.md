@@ -1,7 +1,7 @@
 # building.registry
 [![DOI](https://zenodo.org/badge/261487353.svg)](https://zenodo.org/badge/latestdoi/261487353)
 
-The building schematic of Vienna in the late 1920s was knowledge base for real estate and finance business. At this time, the schematic was published on paper. The  [Wienbibliothek im Rathaus](https://www.wienbibliothek.at/) scanned the documents and distribute the [Häuser-Kataster der Bundeshauptstadt Wien](www.permalink.obvsg.at/wbr/AC07637508) online in PDF format. We converted the PDFs into a machine-readable format.
+The building schematic of Vienna in the late 1920s was a knowledge base for real estate and finance business. At this time, the schematic was published on paper. The  [Wienbibliothek im Rathaus](https://www.wienbibliothek.at/) scanned the documents and distribute the [Häuser-Kataster der Bundeshauptstadt Wien](https://permalink.obvsg.at/wbr/AC07637508) online in PDF format. We converted the PDFs into a machine-readable format.
 
 The dataset includes 42,861 data entries (rows), which stand for buildings and properties, respectively. It includes 12 data fields (columns) as followed:
 
