@@ -14,7 +14,7 @@ This repository includes:
 
 * [Dataset](Dataset.csv): The CSV file includes the data records.
 * [Codebook](Codebook.md): The markdown file specifies the dataset format, the data fields and comments the data fields to facilitate the use of the data records.
-* [Data descriptor](./Data descriptor_files): The folder includes the machine-readable Input dataset version 1 and 2 as described in the corresponding Data descriptor.
+* [Data descriptor](./Data.descriptor_files): The folder includes the machine-readable Input dataset version 1 and 2 as described in the corresponding Data descriptor.
 
 
 This work is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
