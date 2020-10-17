@@ -28,51 +28,39 @@ library(ggpubr)
 ```
 
 # Preface
-This code ....
+This code corresponds with the Technical Validation section in the Data Descriptor "Building schematic of Vienna in the late 1920s", published by Nature Scientific Data.
+
+Please consider the following steps to run the code
+1. Create a new directory on your computer (e.g. "c:/building.schematic")
+2. Download the files from the [Github repository](https://github.com/ukral/building.registry) into your new directory.
+3. Copy the path of your new directory into the code at line 42.
 
 # Import datasets
-In order to run the code, please set your working directory at code line 42.
-
-
 
 ```{r}
-
-
 ######################################################################################
-# set working directory
-#setwd(dir = "C:/Users/u.kral/Documents")
+path <- "C:/Users/u.kral/ownCloud/03_TU Wien/Github/building.schematic/"
 ######################################################################################
-
-# download the files from github repository
-#download.file(url = "https://github.com/ukral/building.registry/raw/master/Dataset.csv", destfile = "Dataset.csv")
-#download.file(url = "https://github.com/ukral/building.registry/raw/master/Dataset.csv", destfile = "Dataset.csv")
-
-
-
-######################################################################################
-path <- "C:/Users/u.kral/ownCloud/03_TU Wien/Github/historic.building.registry.vienna/"
-######################################################################################
-
 
 
 # Import file "Dataset.csv". which is the digital building schematic.
 dataset <- read.csv(file=paste(path, "Dataset.csv", sep = ""), sep = ";", stringsAsFactors = FALSE, encoding = "UTF-8")
 
 # Import file "Online-Only Table 2.csv" which is identical with Online-only Table 2 in the Data Descriptor.
-cadastral_raw <- read.csv(file=paste(path, "Data.descriptor_files/Online-only Table 2.csv", sep=""),  sep = ";" , stringsAsFactors = F)
+cadastral_raw <- read.csv(file=paste(path, "/Data.descriptor/Online-only Table 2.csv", sep=""),  sep = ";" , stringsAsFactors = F)
 cadastral <- cadastral_raw[1:66,]
 
 # Import file "adressen_standorte_wien_20201015.csv". This file includes today's street names. The is available on the Open Govoernment Data plattforma and can be retrieved from https://www.data.gv.at/katalog/dataset/stadt-wien_adressdatenderstadtwien. We retrieved the file at 15 October 2020 and copied it the the Github repository.
-adressen <- read.csv(file=paste(path, "Data.descriptor_files/adressen_standorte_wien_20201015.csv", sep=""), sep = ";", stringsAsFactors = F,fileEncoding = "UTF-8")
+adressen <- read.csv(file=paste(path, "/Data.descriptor/adressen_standorte_wien_20201015.csv", sep=""), sep = ";", stringsAsFactors = F,fileEncoding = "UTF-8")
 
 
 # Import file "statistical_yearbook (1914).xlsx"
-floors_1914 <- data.frame(read_xlsx(paste(path, "Data.descriptor_files/statistical_yearbook (1914).xlsx", sep=""), sheet = "STKW_hist", col_names = F, range = "B7:I27"), stringsAsFactors = F)
+floors_1914 <- data.frame(read_xlsx(paste(path, "/Data.descriptor/statistical_yearbook (1914).xlsx", sep=""), sheet = "STKW_hist", col_names = F, range = "B7:I27"), stringsAsFactors = F)
 
 colnames(floors_1914) <- c("UD.1920s", "FLOORS_0", "FLOORS_1", "FLOORS_2", "FLOORS_3", "FLOORS_4", "FLOORS_5", "FLOORS_unknown")
 
 # Import file "statistical_yearbook (1923).xlsx"
-yearbook_1923 <- read_xlsx(paste(path, "Data.descriptor_files/statistical_yearbook (1923).xlsx", sep=""), sheet = "Rohdaten", col_names =  TRUE, col_types = rep("numeric", times = 6))
+yearbook_1923 <- read_xlsx(paste(path, "/Data.descriptor/statistical_yearbook (1923).xlsx", sep=""), sheet = "Rohdaten", col_names =  TRUE, col_types = rep("numeric", times = 6))
 
 
 

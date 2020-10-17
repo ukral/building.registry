@@ -14,6 +14,6 @@ This repository includes the following key files.
 
 * [Dataset](Dataset.csv): The CSV file includes the data records.
 * [Codebook](./Codebook/Codebook.md), which specifies the dataset format, the data fields and comments the data fields.
-* [R-Code for the Technical Validation](./Data.descriptor/Technical validation.Rmd) of the [Dataset](Dataset.csv)
+* [R-Code for the Technical Validation](./Data.descriptor/Technical_validation.Rmd) of the [Dataset](Dataset.csv)
 
 This work is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
