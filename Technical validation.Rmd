@@ -1,0 +1,793 @@
+---
+title: "Technical Validation"
+author: "Ulrich Kral"
+date: "14 10 2020"
+output:
+  html_document:
+    
+    code_folding: hide
+    fig_caption: true
+    number_sections: true
+    toc: true
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+
+library(plyr)
+library(dplyr)
+library(naniar)
+library(readxl)
+library(ggplot2)
+library(patchwork)
+library(splus2R)
+library(ggpubr)
+
+```
+
+# Preface
+This code ....
+
+# Import datasets
+In order to run the code, please set your working directory at code line 42.
+
+
+
+```{r}
+
+
+######################################################################################
+# set working directory
+#setwd(dir = "C:/Users/u.kral/Documents")
+######################################################################################
+
+# download the files from github repository
+#download.file(url = "https://github.com/ukral/building.registry/raw/master/Dataset.csv", destfile = "Dataset.csv")
+#download.file(url = "https://github.com/ukral/building.registry/raw/master/Dataset.csv", destfile = "Dataset.csv")
+
+
+
+######################################################################################
+path <- "C:/Users/u.kral/ownCloud/03_TU Wien/Github/historic.building.registry.vienna/"
+######################################################################################
+
+
+
+# Import file "Dataset.csv". which is the digital building schematic.
+dataset <- read.csv(file=paste(path, "Dataset.csv", sep = ""), sep = ";", stringsAsFactors = FALSE, encoding = "UTF-8")
+
+# Import file "Online-Only Table 2.csv" which is identical with Online-only Table 2 in the Data Descriptor.
+cadastral_raw <- read.csv(file=paste(path, "Data.descriptor_files/Online-only Table 2.csv", sep=""),  sep = ";" , stringsAsFactors = F)
+cadastral <- cadastral_raw[1:66,]
+
+# Import file "adressen_standorte_wien_20201015.csv". This file includes today's street names. The is available on the Open Govoernment Data plattforma and can be retrieved from https://www.data.gv.at/katalog/dataset/stadt-wien_adressdatenderstadtwien. We retrieved the file at 15 October 2020 and copied it the the Github repository.
+adressen <- read.csv(file=paste(path, "Data.descriptor_files/adressen_standorte_wien_20201015.csv", sep=""), sep = ";", stringsAsFactors = F,fileEncoding = "UTF-8")
+
+
+# Import file "statistical_yearbook (1914).xlsx"
+floors_1914 <- data.frame(read_xlsx(paste(path, "Data.descriptor_files/statistical_yearbook (1914).xlsx", sep=""), sheet = "STKW_hist", col_names = F, range = "B7:I27"), stringsAsFactors = F)
+
+colnames(floors_1914) <- c("UD.1920s", "FLOORS_0", "FLOORS_1", "FLOORS_2", "FLOORS_3", "FLOORS_4", "FLOORS_5", "FLOORS_unknown")
+
+# Import file "statistical_yearbook (1923).xlsx"
+yearbook_1923 <- read_xlsx(paste(path, "Data.descriptor_files/statistical_yearbook (1923).xlsx", sep=""), sheet = "Rohdaten", col_names =  TRUE, col_types = rep("numeric", times = 6))
+
+
+
+
+```
+
+
+# Internal validation
+This code section produces Figure 6 in the Data Descriptor.
+## ID
+```{r}
+
+id_0 <- grep("_[0-9]*", dataset$ID) # aufgefalteteten IDs
+id_1 <- grep("^[0-9]*$", dataset$ID) # nicht aufgefaltet
+id_2 <- grep("_[1]$", dataset$ID) # nur die mit _1
+
+id_plot_data <- dataset
+id_plot_data$id_flag <- rep(NA, nrow(dataset))
+id_plot_data[id_0, "id_flag"] <- "yes" # logic: ID unfolded: yes
+id_plot_data[id_1, "id_flag"] <- "no"
+
+id_plot_data_grouped <- id_plot_data %>%
+  group_by(UD.1920s, id_flag) %>%
+  summarize(count = n())
+
+id_plot_data_grouped <- data.frame(id_plot_data_grouped, stringsAsFactors = F)
+
+totals<- id_plot_data_grouped %>%
+	group_by(UD.1920s) %>%
+	summarise(total = sum(count))
+
+# Plot
+id_plot <- ggplot(id_plot_data_grouped, aes(x=UD.1920s, y=count, fill= factor(id_flag, levels = c("yes", "no")))) +
+  geom_bar(stat="identity", position="stack")+
+  labs(title = "ID", x="Urban district (UD.1920s)", y="Number of data entries")+
+  theme(plot.title = element_text(face = "bold"))+
+  scale_fill_manual(name = "ID unfolded", values=c('lightblue','darkblue'))+
+  geom_text(data=totals, aes(x=UD.1920s, label=total, y=total, fill=NULL), nudge_y=150, size = 3)+
+  scale_x_continuous(breaks = c(1:21))
+id_plot
+
+
+```
+
+## STR.1920s
+```{r}
+
+
+str_ma37 <- as.character(levels(as.factor(adressen$NAME_STR)))
+
+# Standardizing the street names in "Adressen Standorte Wien", which is the external datasource for validating STR.1920s and STR.2010s names in the dataset
+str_m <- gsub(" ","", str_ma37) 
+str_m <- lowerCase(str_m) 
+str_m <- gsub("st\\.", "sankt", str_m)
+str_m <- gsub("-","",str_m) 
+str_m <- gsub("dr\\.","dr",str_m) 
+str_m <- gsub("ß","ss",str_m)
+str_m <- gsub("'","",str_m)
+str_m <- gsub("\\.","",str_m)
+
+str_gesamt <- data.frame(str_m, str_m, stringsAsFactors = FALSE)
+colnames(str_gesamt) <- c("str_gesamt", "str_ma37")
+
+# Standardizing the STR.1920s names in the dataset
+dataset$str_1920_norm <- dataset$STR.1920s
+dataset$str_1920_norm <- lowerCase(dataset$str_1920_norm) 
+dataset$str_1920_norm <- gsub("ß","ss", dataset$str_1920_norm)
+dataset$str_1920_norm <- gsub("st\\.","sankt",dataset$str_1920_norm)
+dataset$str_1920_norm <- gsub("dr\\.","dr",dataset$str_1920_norm)
+dataset$str_1920_norm <- gsub(" ","", dataset$str_1920_norm) 
+dataset$str_1920_norm <- gsub("'","",dataset$str_1920_norm)
+dataset$str_1920_norm <- gsub("\\.","", dataset$str_1920_norm)
+dataset$str_1920_norm <- gsub("-","", dataset$str_1920_norm)
+dataset$str_1920_norm <- gsub("\\(","", dataset$str_1920_norm)
+dataset$str_1920_norm <- gsub("\\)","", dataset$str_1920_norm)
+
+dataset$str_2010_norm <- dataset$STR.2010s
+dataset$str_2010_norm <- lowerCase(dataset$str_2010_norm) # alles auf Kleinbuchstaben
+dataset$str_2010_norm <- gsub("ß","ss", dataset$str_2010_norm)
+dataset$str_2010_norm <- gsub("st\\.","sankt",dataset$str_2010_norm)
+dataset$str_2010_norm <- gsub("dr\\.","dr",dataset$str_2010_norm)
+dataset$str_2010_norm <- gsub(" ","", dataset$str_2010_norm) # Leerzeichen entfernen
+dataset$str_2010_norm <- gsub("'","",dataset$str_2010_norm)
+dataset$str_2010_norm <- gsub("\\.","", dataset$str_2010_norm)
+dataset$str_2010_norm <- gsub("-","", dataset$str_2010_norm)
+dataset$str_2010_norm <- gsub("\\(","", dataset$str_2010_norm)
+dataset$str_2010_norm <- gsub("\\)","", dataset$str_2010_norm)
+
+# Assigning standardized names from "Adressen Standorte Wien" to the standardized names of STR.2010s.
+dataset <- merge(dataset, str_gesamt, by.x = "str_2010_norm", by.y = "str_gesamt", all.x = TRUE)
+
+# Assigning standardized names from "Adressen Standorte Wien" to the standardized names of STR.1920s.
+dataset <- merge(dataset, str_gesamt, by.x = "str_1920_norm", by.y = "str_gesamt", all.x = TRUE)
+
+length(levels(as.factor(dataset$str_ma37.y))) # 2587 werden gefunden
+
+match_yes<- dataset[which(dataset$str_ma37.y != ""),] # nrow 41195 gefunden, no change
+match_no <- dataset[which(is.na(dataset$str_ma37.y) == T),] # 1666 nicht gefunden
+
+match_yes_control <- dataset[which(dataset$str_1920_norm == dataset$str_2010_norm), ] # 40489
+match_no_control <- dataset[which(dataset$str_1920_norm != dataset$str_2010_norm), ] # 2372 f: 281 bei STR.1920s.
+
+
+# 2010 vs. 1920. Die Summe der Einträge ist 2372 Passt mit match_no_control überein.
+# test 1 und test 2: Schreibweise durch Adressen Standorte Wien bestätigt. 580+129 = 709
+# test 3 und test 4: Schreibweise durch Adressen Standorte Wien NICHT bestätigt. 1405+258 = 1663
+
+test1 <- match_no_control[which(is.na(match_no_control$str_ma37.y) == F & is.na(match_no_control$str_ma37.x) == F),] # 580 Straßenname hat sich geändert.
+test2 <- match_no_control[which(is.na(match_no_control$str_ma37.y) == F & is.na(match_no_control$str_ma37.x) == T),] # 129, keine entsprechung bzw. aus dem Verkehrsflächenverzeichnis gestrichen.
+test3 <- match_no_control[which(is.na(match_no_control$str_ma37.y) == T &is.na(match_no_control$str_ma37.x) == F),] # 1405, Straßenname hat sich geändert.
+test4 <- match_no_control[which(is.na(match_no_control$str_ma37.y) == T &is.na(match_no_control$str_ma37.x) == T),] # 258, keine entsprechung bzw. aus dem Verkehrsflächenverzeichnis gestrichen.
+
+
+# unique Einträge
+test1_uni <- unique(test1[,c("str_1920_norm","str_2010_norm")])
+test2_uni <- unique(test2[,c("str_1920_norm","str_2010_norm")])
+test3_uni <- unique(test3[,c("str_1920_norm","str_2010_norm")])
+test4_uni <- unique(test4[,c("str_1920_norm","str_2010_norm")])
+
+# Diese Zahlen kommen in den Data Descriptor
+str_1920_spelling_rows <- cbind(c(nrow(match_yes_control), nrow(match_no_control ), nrow(test1), nrow(test2), nrow(test3), nrow(test4)), round(c(nrow(match_yes_control), nrow(match_no_control ), nrow(test1), nrow(test2), nrow(test3), nrow(test4))/nrow(dataset)*100,2))
+
+dataset$str_1920_spelling = c(rep(NA, nrow(dataset)))
+
+# für barplots
+
+pos_str_1920_spelling_1 <- c(which(dataset$str_1920_norm == dataset$str_2010_norm), which(is.na(match_no_control$str_ma37.y) == F & is.na(match_no_control$str_ma37.x) == F), which(is.na(match_no_control$str_ma37.y) == F & is.na(match_no_control$str_ma37.x) == T))
+
+pos_str_1920_spelling_2 <- c(which(is.na(match_no_control$str_ma37.y) == T &is.na(match_no_control$str_ma37.x) == F),which(is.na(match_no_control$str_ma37.y) == T &is.na(match_no_control$str_ma37.x) == T))
+
+length(pos_str_1920_spelling_1)+length(pos_str_1920_spelling_2)-nrow(dataset)
+
+str_1920_spelling_t1 <- c(match_yes_control[,"ID"], test1[,"ID"], test2[,"ID"])
+str_1920_spelling_t2 <- c(test3[,"ID"], test4[,"ID"])
+
+
+dataset[(dataset$ID %in% str_1920_spelling_t1), "str_1920_spelling"] <- "1" # Adressen Standorte Wien
+dataset[(dataset$ID %in% str_1920_spelling_t2), "str_1920_spelling"] <- "2" # # Wien Geschichte Wiki, Analog Building Schematic
+
+
+rows_pos_str_1920_spelling <- dataset %>%
+  group_by(UD.1920s, str_1920_spelling) %>%
+  summarize(count_spelling_1920 = n())
+
+
+################
+
+dataplot <- data.frame(rows_pos_str_1920_spelling, stringsAsFactors = F)
+dataplot <- rbind(dataplot, c(8,2,0))
+dataplot <- dataplot[order(dataplot$UD.1920s, dataplot$str_1920_spelling),]
+
+totals<- dataplot %>%
+	group_by(UD.1920s) %>%
+	summarise(total=sum(count_spelling_1920))
+
+
+# Plot
+str_1920_plot <- ggplot(dataplot, aes(x=UD.1920s, y=count_spelling_1920, fill= factor(str_1920_spelling, levels = c("2","1")))) +
+  geom_bar(stat="identity", position="stack") +
+  labs(title = "STR.1920s", x="Urban district (UD.1920s)", y="Number of data entries") +
+  scale_fill_manual(name = "Name spelling\nverified by", labels = c("Digital building schematic,\nWien Geschichte Wiki", "Adressen Standorte Wien"), values=c('lightblue','darkblue')) +
+  geom_text(data=totals, aes(x=UD.1920s, label=total, y=total, fill=NULL), nudge_y=150, size = 3) +
+  scale_x_continuous(breaks = c(1:21)) +
+  theme(plot.title = element_text(face = "bold"))
+str_1920_plot
+
+
+count_spelling_1920_sum <- nrow(dataset) - sum(dataplot$count_spelling_1920)
+
+
+
+```
+
+
+## STR.2010s
+```{r}
+
+str_2010_1 <- dataset[which(is.na(dataset$str_ma37.x) == FALSE),] # diese wurden alle gefunden
+str_2010_2 <- dataset[which(is.na(dataset$str_ma37.x) == TRUE),] # STR.2010 ist leer
+#str_2010_3 <- which((control2$str_2010_norm) != "") # STR.2010 vorhanden, aber mit Adressen Standorte Wien nicht verifiziert. Dafür mit Online-Stadtplen
+
+str_2010_sum <- nrow(dataset) - length(str_2010_1) - length(str_2010_2)
+
+str_2010_spelling_t1 <- str_2010_1[,"ID"]
+str_2010_spelling_t2 <- str_2010_2[,"ID"]
+
+dataset[(dataset$ID %in% str_2010_spelling_t1), "str_2010_spelling"] <- "1" # Adressen Standorte Wien
+dataset[(dataset$ID %in% str_2010_spelling_t2), "str_2010_spelling"] <- "2" # keine STR.2010s
+
+rows_pos_str_2010_spelling <- dataset %>%
+  group_by(UD.1920s, str_2010_spelling) %>%
+  summarize(count_spelling_2010 = n())
+
+
+
+
+
+dataplot <- data.frame(rows_pos_str_2010_spelling, stringsAsFactors = F)
+dataplot <- rbind(dataplot, c(8,2,0))
+dataplot <- dataplot[order(dataplot$UD.1920s, dataplot$str_2010_spelling),]
+
+totals<- dataplot %>%
+	group_by(UD.1920s) %>%
+	summarise(total=sum(count_spelling_2010))
+
+
+# Plot
+str_2010_plot <- ggplot(dataplot, aes(x=UD.1920s, y=count_spelling_2010, fill= factor(str_2010_spelling, levels = c("2","1")))) +
+  geom_bar(stat="identity", position="stack") +
+  labs(title = "STR.2010s", x="Urban district (UD.1920s)", y="Number of data entries") +
+  scale_fill_manual(name = "Name spelling\nverified by", labels = c("not relevant, because no STR.2010s\ncounterpart from STR.1920s", "Adressen Standorte Wien"), values=c('#999999','darkblue')) +
+  geom_text(data=totals, aes(x=UD.1920s, label=total, y=total, fill=NULL), nudge_y=150, size = 3) +
+  scale_x_continuous(breaks = c(1:21))+
+  theme(plot.title = element_text(face = "bold"))
+str_2010_plot
+
+
+count_spelling_2010_sum <- nrow(dataset) - sum(dataplot$count_spelling_2010)
+
+
+```
+
+
+## UD.1920
+```{r}
+
+
+ud <- dataset %>%
+  group_by(UD.1920s) %>%
+  summarize(count = n())
+
+ud <- data.frame(ud, stringsAsFactors = F)
+
+ud_merge <- merge(ud, unique(cadastral[,c("UD.1920s", "Volume")]), by.x = "UD.1920s", by.y = "UD.1920s", sort = F)
+ud_merge <- data.frame(ud_merge, stringsAsFactors = F)
+
+
+ud_plot <-ggplot(data=ud_merge, aes(x=UD.1920s, y=count, fill = factor(Volume, levels = c(1:10)))) +
+  geom_bar(stat="identity", width=.8) +
+  geom_text(aes(label=count), nudge_y=120, size = 3)+
+  labs(title = "UD.1920s", x="Urban district (UD.1920s)", y="Number of data entries") +
+  scale_x_continuous(breaks = c(1:21))+
+  theme(plot.title = element_text(face = "bold"))+
+  scale_fill_discrete("Volume of analog\nbuilding schematic")
+ud_plot
+
+ud_sum <- nrow(dataset) - sum(ud$count)
+```
+
+
+## CC.2010s
+
+```{r}
+
+cc <- dataset %>%
+  group_by(CC.2010s) %>%
+  summarize(count = n())
+
+cc <- data.frame(cc, stringsAsFactors = F)
+cc$CC.2010s <- as.character(cc$CC.2010s)
+
+cadastral_raw_filter <- cadastral_raw[grep("\\d", cadastral_raw$cadastral.number_1920s),]
+cadastral_raw_filter$cadastral.number_2010s <- as.character(cadastral_raw_filter$cadastral.number_2010s)
+
+cc_merge <- merge(cc, cadastral_raw_filter, by.x = "CC.2010s", by.y = "cadastral.number_2010s", by=all, sort = F)
+cc_merge  <- data.frame(cc_merge , stringsAsFactors = F)
+
+totals<- cc  %>%
+	group_by(CC.2010s) %>%
+	summarise(total=sum(count))
+
+cc_plot <-ggplot(data=cc_merge, aes(x=CC.2010s, y=count, fill = factor(Volume, levels = c(1:10)))) +
+  geom_bar(stat="identity") +
+  geom_text(aes(label=count), vjust=0.3, hjust=-.5, size=2.5, angle = 90) +
+  labs(title = "CC.2010s", x="Cadastral communites (CC.2010s)",y="Number of data entries") +
+  theme(axis.text.x=element_text(angle = 90, size = 6),plot.title = element_text(face = "bold"))+
+  coord_cartesian(ylim = c(0,round(max(cc$count),-3)))+
+  scale_fill_discrete(name = "Volume of analog\nbuilding schematic")
+cc_plot
+
+cc_sum <- nrow(dataset) - sum(cc_merge$count)
+```
+
+## BN.1920s
+
+```{r}
+
+# Define categories
+
+pos1 <- grep("\\D$", dataset$BN.1920s) # 
+test1 <- levels(as.factor(dataset[pos1, "BN.1920s"])) # 118b
+
+pos2 <- grep("\\d$", dataset$BN.1920s) # 
+test2 <- levels(as.factor(dataset[pos2, "BN.1920s"])) # 118 inkl. 2 Einträge für "neben27"
+
+pos3 <- which(dataset$BN.1920s =="")
+test3 <- dataset[pos3,]
+
+pos4 <- grep("^[A-Za-z]", dataset$BN.1920s)
+test4 <- levels(as.factor(dataset[pos4, "BN.1920s"])) # 2 Einträge für "neben27"
+
+# die "neben27" rausfiltern
+t <- which(pos2 %in% pos4)
+pos2 <- pos2[-t] 
+
+pos_test <- grep("^[1-9]*$", dataset$BN.1920s) # 
+test <- levels(as.factor(dataset[pos_test, "BN.1920s"])) # Nur Zahlen inkl blanks. Bekomme die Blanks nicht weg
+
+
+pos_comb <- c(pos1, pos2, pos3)
+pos_c <- length(pos1)+length(pos2)+length(pos3)
+
+bn.count <- c(length(pos2)-2, length(pos1), length(pos4), length(pos3))
+bn.discr <- c("Only Integer", "Integer and letters", "Letters and integers", "Data not available")
+
+bn.table <- cbind(bn.discr, bn.count)
+bn.table <- as.data.frame(bn.table, stringsAsFactors = F)
+bn.table$bn.count <- as.numeric(bn.table$bn.count)
+bn.table$rel <- bn.table$bn.count / sum(bn.table$bn.count)*100
+
+dataset$bn.table.ud = rep(NA, nrow(dataset))
+dataset[pos1,"bn.table.ud"] <- bn.discr[2]
+dataset[pos2,"bn.table.ud"] <- bn.discr[1]
+dataset[pos3,"bn.table.ud"] <- bn.discr[4]
+dataset[pos4,"bn.table.ud"] <- bn.discr[3]
+
+####
+
+
+bn.table_ud <- dataset %>%
+  group_by(UD.1920s, bn.table.ud) %>%
+  summarize(count = n())
+
+test_sum <- nrow(dataset)- sum(bn.table_ud$count)
+
+# stacked barplot
+bn.table_ud <- data.frame(bn.table_ud, stringsAsFactors = F)
+
+totals<- bn.table_ud %>%
+	group_by(UD.1920s) %>%
+	summarize(total=sum(count))
+
+position_bn <- levels(as.factor(bn.table_ud$bn.table.ud))
+
+bn_plot <-ggplot(data=bn.table_ud, aes(x=UD.1920s, y=count, fill = factor(bn.table.ud, levels = position_bn[c(1,3,2,4)]))) +
+  geom_bar(stat="identity") +
+  scale_fill_manual(name = "Data pattern", values=c('#999999','#87CEFA','#4169E1','darkblue')) +
+  labs(title = "BN.1920s", x="Urban district (UD.1920s)", y="Number of data entries") +
+  geom_text(data=totals, aes(x=UD.1920s, label=total, y=total, fill=NULL), nudge_y=150, size = 3)+
+  scale_x_continuous(breaks = c(1:21))+
+  theme(plot.title = element_text(face = "bold"))
+bn_plot
+
+
+```
+
+## AREA.1920s
+
+```{r}
+
+area_pos_yes <- which(dataset$AREA.1920s != "")
+area_pos_no <- which(is.na(dataset$AREA.1920s) == TRUE)
+
+dataset$area_flag <- c(rep(NA, nrow(dataset)))
+dataset[area_pos_yes, "area_flag"] <- "yes"
+dataset[area_pos_no, "area_flag"] <- "no"
+
+area_plot3 <- dataset %>%
+  group_by(UD.1920s, area_flag) %>%
+  summarize(count = n())
+
+test <- dataset[dataset$AREA.1920s == "NA",]
+
+totals<- area_plot3 %>%
+	group_by(UD.1920s) %>%
+	summarise(total=sum(count))
+
+# Stacked barplot
+area_plot <- ggplot(area_plot3, aes(fill=area_flag, y=count, x=UD.1920s)) + 
+    geom_bar(position="stack", stat="identity") +
+    scale_fill_manual(name = "Area\ndefined", labels = c("no", "yes"), values=c('#999999','darkblue')) +
+    geom_text(data=totals, aes(x=UD.1920s, label=total, y=total, fill=NULL), nudge_y=150, size = 3) +
+    labs(title = "AREA.1920s", x="Urban district (UD.1920s)", y="Number of data entries")+
+    scale_x_continuous(breaks = c(1:21))+
+  theme(plot.title = element_text(face = "bold"))
+area_plot 
+
+
+```
+
+## POS.1920s
+
+```{r}
+
+
+## bezirksweise
+pos_plot_data <- dataset %>%
+  group_by(UD.1920s, POS.1920s) %>%
+  summarize(count = n())
+
+pos_plot_data <- data.frame(pos_plot_data, stringsAsFactors = F)
+
+totals<- pos_plot_data  %>%
+	group_by(UD.1920s) %>%
+	summarise(total=sum(count))
+
+position_pos <- levels(as.factor(pos_plot_data$POS.1920s))
+
+pos_plot <- ggplot(pos_plot_data, aes(fill=factor(POS.1920s, levels = position_pos[c(1,3,5,6,2,4)]), y=count, x=UD.1920s)) + 
+    geom_bar(position="stack", stat="identity") +
+    scale_fill_manual(name = "Data pattern", labels = c("Data not\navailable", position_pos[c(3,5,6,2,4)]), values = c('#999999','#F0F8FF','#E6E6FA','#87CEFA','#483D8B','darkblue')) +
+    geom_text(data=totals, aes(x=UD.1920s, label=total, y=total, fill=NULL), nudge_y=150, size = 3) +
+    labs(title = "POS.1920s", x="Urban district (UD.1920s)", y="Number of data entries")+
+    scale_x_continuous(breaks = c(1:21))+
+  theme(plot.title = element_text(face = "bold"))
+pos_plot
+
+```
+
+## FLOORS.1920s
+```{r}
+
+
+## bezirksweise
+floors_plot_bez <- dataset %>%
+  group_by(UD.1920s, FLOORS.1920s) %>%
+  summarize(count = n())
+
+floors_plot_bez <- data.frame(floors_plot_bez, stringsAsFactors = F)
+
+
+totals<- floors_plot_bez  %>%
+	group_by(UD.1920s) %>%
+	summarise(total=sum(count))
+
+floor_plot <- ggplot(floors_plot_bez, aes(fill=FLOORS.1920s, y=count, x=UD.1920s)) + 
+    geom_bar(position="stack", stat="identity") +
+    geom_text(data=totals, aes(x=UD.1920s, label=total, y=total, fill=NULL), nudge_y=150, size = 3) + 
+    labs(title = "FLOORS.1920s", x="Urban district (UD.1920s)", y="Number of data entries", fill ="Number of floors\nabove ground floor")  +
+    #scale_fill_manual(name = "Data class")+  
+     scale_x_continuous(breaks = c(1:21))+
+    theme(plot.title = element_text(face = "bold")) +
+    geom_point(aes(x = 1, y = 1, size = "Data not\navailable"), shape = NA, colour = "grey") +
+    guides(size = guide_legend("", override.aes = list(shape = 15, size = 7)))
+floor_plot
+
+
+
+
+```
+
+## YoC.1920s
+
+```{r}
+
+# Create categories
+
+yoc_salz_pos_1 <- grep("^\\d{4}$", dataset$YoC.1920s) # nur 4 stellige Zahlen
+yoc_salz_pos_2 <- grep("^\\d{4}[,]", dataset$YoC.1920s) # nur 4 stellige Zahlen am Beginn + ein ,
+yoc_salz_pos_3 <- which(dataset$YoC.1920s == "")
+
+dataset$yoc_plot_bez <- rep(NA, nrow(dataset))
+dataset[yoc_salz_pos_1, "yoc_plot_bez"] <- "One year date"
+dataset[yoc_salz_pos_2, "yoc_plot_bez"] <- "Two year date"
+dataset[yoc_salz_pos_3, "yoc_plot_bez"] <- "not available"
+
+
+## bezirksweise
+yoc_plot_bez <- dataset %>%
+  group_by(UD.1920s, yoc_plot_bez) %>%
+  summarize(count = n())
+
+yoc_plot_bez <- data.frame(yoc_plot_bez, stringsAsFactors = F)
+
+totals<- yoc_plot_bez  %>%
+	group_by(UD.1920s) %>%
+	summarise(total=sum(count))
+
+yoc_plot_bez_fig_factor <- levels(as.factor(yoc_plot_bez$yoc_plot_bez))
+
+yoc_plot <- ggplot(yoc_plot_bez, aes(fill= factor(yoc_plot_bez, levels = yoc_plot_bez_fig_factor[c(1,3,2)]), y=count, x=UD.1920s)) + 
+    geom_bar(position="stack", stat="identity") +
+    scale_fill_manual(name = "Data pattern", values=c('#999999','lightblue','darkblue')) + 
+    geom_text(data=totals, aes(x=UD.1920s, label=total, y=total, fill=NULL), nudge_y=150 , size = 3) +
+    labs(title = "YoC.1920s", x="Urban district (UD.1920s)", y="Number of data entries") +
+    scale_x_continuous(breaks = c(1:21))+
+    theme(plot.title = element_text(face = "bold"))
+yoc_plot
+
+```
+
+## YoP.1920s
+```{r}
+
+
+yop_salz_pos_1 <- grep("^\\d{4}$", dataset$YoP.1920s) # nur 4 stellige Zahlen
+yop_salz_pos_2 <- grep("^\\d{4}[,]", dataset$YoP.1920s) # nur 4 stellige Zahlen am Beginn + ein ,
+yop_salz_pos_3 <- which(dataset$YoP.1920s == "")
+
+dataset$yop_plot_bez <- rep(NA, nrow(dataset))
+dataset[yop_salz_pos_1, "yop_plot_bez"] <- "One year date"
+dataset[yop_salz_pos_2, "yop_plot_bez"] <- "Two year date"
+dataset[yop_salz_pos_3, "yop_plot_bez"] <- "not available"
+
+
+
+## bezirksweise
+yop_plot_bez_fig <- dataset %>%
+  group_by(UD.1920s, yop_plot_bez) %>%
+  summarize(count = n())
+
+yop_plot_bez_fig <- data.frame(yop_plot_bez_fig, stringsAsFactors = F)
+
+totals<- yop_plot_bez_fig  %>%
+	group_by(UD.1920s) %>%
+	summarise(total=sum(count))
+
+yop_plot_bez_fig_factor <- levels(as.factor(yop_plot_bez_fig$yop_plot_bez))
+
+yop_plot <- ggplot(yop_plot_bez_fig, aes(fill = factor(yop_plot_bez, levels = yop_plot_bez_fig_factor[c(1,3,2)]), y=count, x=UD.1920s)) + 
+    geom_bar(position="stack", stat="identity") +
+    scale_fill_manual(name = "Data pattern", values=c('#999999','lightblue','darkblue')) +
+    geom_text(data=totals, aes(x=UD.1920s, label=total, y=total, fill=NULL), nudge_y=150, size = 3) +
+    labs(title="YoP.1920s", x="Urban district (UD.1920s)", y="Number of data entries") +
+    scale_x_continuous(breaks = c(1:21))+
+  theme(plot.title = element_text(face = "bold"))
+yop_plot
+
+```
+## PDF.pages
+```{r}
+
+
+cadastral$PDF.page.nr <- cadastral$PDF.page.end - cadastral$PDF.page.start + 1
+
+# Page count: Anaolog building schematic
+kg1 <- aggregate(PDF.page.nr ~ UD.1920s, cadastral, sum)
+
+kg12 <- sum(kg1$PDF.page.nr, na.rm = TRUE) # total page number
+
+cadastral$vol_par <- paste(as.character(cadastral$UD.1920s), as.character(cadastral$Volume), as.character(cadastral$Part), sep = "-")
+
+
+###############
+
+pdf <- unique(dataset[,c("UD.1920s", "Page.pdf")])
+pdf <- pdf[order(pdf$UD.1920s, pdf$Page.pdf),]
+pdf$Page.pdf <- as.integer(pdf$Page.pdf)
+
+
+# add volume
+volume_raw <- unique(cadastral[,c("Volume", "UD.1920s")])
+volume_raw$Volume <- as.integer(volume_raw$Volume)
+volume_raw$UD.1920s <- as.integer(volume_raw$UD.1920s)
+pdf <- merge(pdf,volume_raw, by.x = "UD.1920s", by.y = "UD.1920s", sort = T)
+
+# Seitenanzahl per BEZ
+totals<- kg1[,c("UD.1920s", "PDF.page.nr")]
+#totals$UD.1920s <- as.integer(totals$UD.1920s)
+#totals <- totals[order(totals$UD.1920s),]
+#totals$UD.1920s <- as.character(totals$UD.1920s)
+
+cadastral$PDF.page.end <- as.integer(cadastral$PDF.page.end)
+cadastral$UD.1920s <- as.integer(cadastral$UD.1920s)
+
+max_df <- cadastral %>%
+	group_by(UD.1920s) %>%
+	summarise(max=max(PDF.page.end))
+max_df <- data.frame(max_df, stringsAsFactors = F)
+max_df$UD.1920s <- as.integer(max_df$UD.1920s)
+max_df$max <- as.integer(max_df$max)
+max_df <- max_df[order(max_df$UD.1920s),]
+
+totals$max <- max_df$max
+totals$max <- as.numeric(totals$max)
+totals$label_text <- paste(rep("[",21),totals$PDF.page.nr, "]",sep = "")
+
+  
+pdf_plot <-ggplot(data=pdf, aes(x=UD.1920s, y=Page.pdf)) +
+  geom_point(aes(colour = factor(Volume)), size = 0.1, shape=0) +
+  labs(title = "Page.pdf", x="Urban district (UD.1920s)", y="Page number (Page.pdf)\n[page count]") +
+  scale_colour_discrete("Volume of analog\nbuilding schematic") +
+  guides(color = guide_legend(override.aes = list(size=3, shape = rep(15,10))))+
+  theme(plot.title = element_text(face = "bold", family = "Helvetica"))+
+  scale_x_continuous(breaks = c(1:21))+
+  geom_text(data=totals, aes(x=UD.1920s, label= label_text, y = max), nudge_y=10, size =3)
+pdf_plot
+
+
+
+```
+
+
+# External validation
+## Data Completness: Number of buildings by urban district
+This code section produces Figure 7 in the Data Descriptor.
+
+```{r}
+
+
+a <- which(dataset$BN.1920s != "") # Einträge mit BN.1920s
+b <- which(dataset$BN.1920s == "")
+
+c <- dataset[a,] %>%
+  group_by(UD.1920s) %>%
+  summarize(n())
+c <- data.frame(c)
+colnames(c) <- c("UD.1920s", "counts")
+c1 <- aggregate(counts ~ UD.1920s, c, sum)
+
+
+# "Nach der Schaffung des Bundeslands Wien (29. Dezember 1921 mit Wirksamkeit vom 1. Jänner 1922) kam es zu weiteren Grenzänderungen
+## 22. Dezember 1923: 2./20./21. Bezirk
+## 13. Juni 1930: 10./12. Bezirk
+## 14. Dezember 1932: 13./16. Bezirk
+## 17. Oktober 1935: 16./17. Bezirk)." Quelle: https://www.geschichtewiki.wien.gv.at/Bezirke
+
+
+# Stichtag Volkszählung: 7. März 1923
+
+cd2 <- cbind.data.frame(c1, yearbook_1923$Häuser_2) # Es werden die Daten vom Statischtischen Jahrbuch genommen.https://www.digital.wienbibliothek.at/wbrobv/periodical/pageview/2176992
+cd2$diff.abs <- cd2[,2]-cd2[,3]
+cd2$diff.rel <- round(cd2[,4]/cd2[,3],2)
+colnames(cd2) <- c("UD.1920s", "counts.salzberg", "counts.stat", "diff.abs", "diff.rel")
+
+cd2.sum <- data.frame(sum(cd2$counts.salzberg), sum(cd2$counts.stat), sum(cd2$diff.abs), (sum(cd2$diff.abs) / sum(cd2$counts.stat)))
+
+
+## cd2 plotten
+temp <- cbind(cd2[,2:3], yearbook_1923$Häuser_3)
+
+
+# Plotting figure
+
+data.salz <- data.frame(c(1:21), rep("building schematic", 21), cd2[,2])
+data.stat <- data.frame(c(1:21), rep("census", 21), cd2[,3])
+coln <- c("UD.1920s", "data_source", "counts")
+colnames(data.salz) <- coln
+colnames(data.stat) <- coln
+
+data <- rbind(data.stat, data.salz)
+
+p <- ggplot(data, aes(fill=data_source, y=counts, x=UD.1920s)) + 
+    geom_bar(position="dodge", stat="identity") +
+    ggtitle("Comparative building counts") + 
+    scale_x_continuous(labels = c(1:21), breaks = c(1:21)) +
+    labs(y= "Number of buildings", x = "Urban district") +
+    scale_fill_discrete(name = "Data source", labels = c("Statistical yearbook (1923)", "Digital building schematic (1927-30)")) + 
+    theme(legend.position = c(0.23,0.85))
+p
+
+```
+
+## Data plausibility: Number of buildings by floor counts
+This code section produces Figure 8 in the Data Descriptor.
+
+```{r}
+
+floors_salz <- dataset %>%
+  group_by(FLOORS.1920s) %>%
+  summarise(anz = n())
+
+floors_salz$cum <- cumsum(floors_salz$anz)
+
+# Validierung mit Stockwerksstatitisk von 1914
+
+# Gebäude filtern (Integer, Integer and letter, letter and integer)
+buildings_w_bn_pos <- which(dataset$bn.table.ud != "Data not available")
+
+floors <- dataset[buildings_w_bn_pos,] %>%
+  group_by(FLOORS.1920s) %>%
+  summarize(n_salz = n())
+
+floors$FLOORS.1920s <- as.character(floors$FLOORS.1920s)
+
+floors[7,1] <- "unknown" # Mache NA zu "unknown""
+
+#floors <- floors[order(floors$FLOORS.1920s),]
+
+
+# Gebäude nach Stockwerken 1914 einlesen
+
+floors_1914_wien <- data.frame(colSums(floors_1914[,2:8]))
+
+floors_complete_1914 <- cbind(c("ground floor only", "1", "2", "3", "4", "5 or more", "unknown"), rep("Statistical yearbook (1914)",7), floors_1914_wien$colSums.floors_1914...2.8..)
+colnames(floors_complete_1914) <- c("Floors", "data_source", "count")                                                                                          
+
+floors_complete_1920s <- cbind(c("ground floor only", "1", "2", "3", "4", "5 or more", "unknown"), rep("Digital building schematic (1927-30)",7), c(NA, floors[1,2],floors[2,2],floors[3,2],floors[4,2], sum(floors[5:6,2]), floors[7,2]))
+
+
+colnames(floors_complete_1920s) <- c("Floors","data_source", "count")             
+                                                                                                                      
+floors_complete <- data.frame(rbind(floors_complete_1914, floors_complete_1920s), stringsAsFactors = F)
+
+rownames(floors_complete) <- NULL
+floors_complete$count <- as.numeric(floors_complete$count)
+floors_complete$Floors <- as.character(floors_complete$Floors)
+
+positions <- c("ground floor only", "1", "2", "3", "4", "5 or more", "unknown")
+floors_complete$count_label <- floors_complete$count
+floors_complete$count_label <- as.character(floors_complete$count_label)
+
+floors_complete[8,3] <- 0
+floors_complete[8,4] <- "NA"
+
+# plot
+floor_valid_plot <- ggplot(floors_complete, aes(x=Floors, y=count, fill=factor(data_source, levels = c("Statistical yearbook (1914)", "Digital building schematic (1927-30)"))))+
+  geom_bar(position="dodge", stat="identity")+
+  scale_x_discrete(limits = positions)+  
+  ggtitle("Comparative building counts") + 
+  labs(y= "Number of buildings", x = "Floors") +
+  scale_fill_discrete(name = "Data source", labels = c("Statistical yearbook (1914)", "Digital building schematic (1927-30)")) +   
+  theme(legend.position = c(0.23,0.85))+
+  coord_cartesian(ylim = c(0, 15000))+
+  geom_text(aes(label=count_label),  position = position_dodge(0.9), vjust=-1, size = 3)
+floor_valid_plot
+
+```
