@@ -14,7 +14,9 @@ This repository includes:
 
 * [Dataset](Dataset.csv): The CSV file includes the data records.
 * [Codebook](Codebook.md): The markdown file specifies the dataset format, the data fields and comments the data fields to facilitate the use of the data records.
-* [Data descriptor](./Data.descriptor_files): The folder includes the machine-readable Input dataset version 1 and 2 as described in the corresponding Data descriptor.
+* [Codebook files](./Codebook_files): Background data to run the [Codebook](Codebook.md) code.
+* [RStudio project](RStudio project.Rproj): The RStudio project file includes the codes [Readme](README.md), [Codebook](Codebook.md) and [Technical Validation](Technical validation.Rmd). 
+* [Data descriptor files](./Data.descriptor_files): Background data to run the [Technical Validation](Technical validation.Rmd) corresponding to the Technical Validation section in the Data descriptor "Building schematic of Vienna in the late 1920s", published by Nature Scientific Data.
 
 
 This work is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
