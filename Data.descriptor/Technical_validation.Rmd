@@ -25,6 +25,8 @@ library(patchwork)
 library(splus2R)
 library(ggpubr)
 
+options(dplyr.summarise.inform=F)
+
 ```
 
 # Preface
@@ -32,7 +34,7 @@ This code corresponds with the Technical Validation section in the Data Descript
 
 Please consider the following steps to run the code
 1. Create a new directory on your computer (e.g. "c:/building.schematic")
-2. Download the files from the [Github repository](https://github.com/ukral/building.registry) into your new directory.
+2. Download the files from the [Github repository](https://github.com/ukral/building.registry) and save them in your new directory.
 3. Copy the path of your new directory into the code at line 42.
 
 # Import datasets
@@ -50,18 +52,16 @@ dataset <- read.csv(file=paste(path, "Dataset.csv", sep = ""), sep = ";", string
 cadastral_raw <- read.csv(file=paste(path, "/Data.descriptor/Online-only Table 2.csv", sep=""),  sep = ";" , stringsAsFactors = F)
 cadastral <- cadastral_raw[1:66,] # Cadastral communities mentioned in the analog building schematic
 
-# Import file "adressen_standorte_wien_20201015.csv". This file includes today's street names. The is available on the Open Government Data platform and can be retrieved from https://www.data.gv.at/katalog/dataset/stadt-wien_adressdatenderstadtwien. We retrieved the file at 15 October 2020 and copied it the the Github repository.
+# Import file "adressen_standorte_wien_20201015.csv". This file includes today's street names in the city of Vienna. [Open data Österreich](https://www.data.gv.at/katalog/dataset/stadt-wien_adressdatenderstadtwien)
 adressen <- read.csv(file=paste(path, "/Data.descriptor/adressen_standorte_wien_20201015.csv", sep=""), sep = ";", stringsAsFactors = F,fileEncoding = "UTF-8")
 
-# Import file "statistical_yearbook (1914).xlsx"
-floors_1914 <- data.frame(read_xlsx(paste(path, "/Data.descriptor/statistical_yearbook (1914).xlsx", sep=""), sheet = "STKW_hist", col_names = F, range = "B7:I27"), stringsAsFactors = F)
+# Import file "statistical_yearbook (1914).xlsx". Data retrieved from digitized report [Statistisches Jahrbuch der Stadt Wien. Bd. 1914](https://www.digital.wienbibliothek.at/wbrobv/periodical/titleinfo/2057276)
+floors_1914 <- read_xlsx(paste(path, "/Data.descriptor/statistical_yearbook (1914).xlsx", sep=""), sheet = "STKW_hist", col_names = TRUE, range = "B7:I27")
 
 colnames(floors_1914) <- c("UD.1920s", "FLOORS_0", "FLOORS_1", "FLOORS_2", "FLOORS_3", "FLOORS_4", "FLOORS_5", "FLOORS_unknown")
 
-# Import file "statistical_yearbook (1923).xlsx"
+# Import file "statistical_yearbook (1923).xlsx". Data retrieved from digitized report [Statistisches Jahrbuch der Stadt Wien. Bd. 1929 (1. Jahrgang)](https://www.digital.wienbibliothek.at/wbrobv/periodical/titleinfo/2057276)
 yearbook_1923 <- read_xlsx(paste(path, "/Data.descriptor/statistical_yearbook (1923).xlsx", sep=""), sheet = "Rohdaten", col_names =  TRUE, col_types = rep("numeric", times = 2))
-
-
 
 
 ```
@@ -69,6 +69,7 @@ yearbook_1923 <- read_xlsx(paste(path, "/Data.descriptor/statistical_yearbook (1
 
 # Internal validation
 This code section produces Figure 6 in the Data Descriptor.
+
 ## ID
 ```{r}
 # Create categories
@@ -150,7 +151,7 @@ dataset <- merge(dataset, str_gesamt, by.x = "str_2010_norm", by.y = "str_gesamt
 # Assigning standardized names from "Adressen Standorte Wien" to the standardized names of STR.1920s.
 dataset <- merge(dataset, str_gesamt, by.x = "str_1920_norm", by.y = "str_gesamt", all.x = TRUE)
 
-length(levels(as.factor(dataset$str_ma37.y))) 
+check_length_ma37.y <- length(levels(as.factor(dataset$str_ma37.y))) 
 
 match_yes<- dataset[which(dataset$str_ma37.y != ""),] 
 match_no <- dataset[which(is.na(dataset$str_ma37.y) == T),] 
@@ -179,7 +180,7 @@ pos_str_1920_spelling_1 <- c(which(dataset$str_1920_norm == dataset$str_2010_nor
 
 pos_str_1920_spelling_2 <- c(which(is.na(match_no_control$str_ma37.y) == T &is.na(match_no_control$str_ma37.x) == F),which(is.na(match_no_control$str_ma37.y) == T &is.na(match_no_control$str_ma37.x) == T))
 
-length(pos_str_1920_spelling_1)+length(pos_str_1920_spelling_2)-nrow(dataset)
+control_length_str_1920 <- length(pos_str_1920_spelling_1)+length(pos_str_1920_spelling_2)-nrow(dataset)
 
 str_1920_spelling_t1 <- c(match_yes_control[,"ID"], test1[,"ID"], test2[,"ID"])
 str_1920_spelling_t2 <- c(test3[,"ID"], test4[,"ID"])
@@ -467,8 +468,7 @@ floor_plot <- ggplot(floors_plot_bez, aes(fill=FLOORS.1920s, y=count, x=UD.1920s
     geom_bar(position="stack", stat="identity") +
     geom_text(data=totals, aes(x=UD.1920s, label=total, y=total, fill=NULL), nudge_y=150, size = 3) + 
     labs(title = "FLOORS.1920s", x="Urban district (UD.1920s)", y="Number of data entries", fill ="Number of floors\nabove ground floor")  +
-    #scale_fill_manual(name = "Data class")+  
-     scale_x_continuous(breaks = c(1:21))+
+    scale_x_continuous(breaks = c(1:21))+
     theme(plot.title = element_text(face = "bold")) +
     geom_point(aes(x = 1, y = 1, size = "Data not\navailable"), shape = NA, colour = "grey") +
     guides(size = guide_legend("", override.aes = list(shape = 15, size = 7)))
@@ -601,7 +601,7 @@ pdf_plot <-ggplot(data=pdf, aes(x=UD.1920s, y=Page.pdf)) +
   labs(title = "Page.pdf", x="Urban district (UD.1920s)", y="Page number (Page.pdf)\n[page count]") +
   scale_colour_discrete("Volume of analog\nbuilding schematic") +
   guides(color = guide_legend(override.aes = list(size=3, shape = rep(15,10))))+
-  theme(plot.title = element_text(face = "bold", family = "Helvetica"))+
+  theme(plot.title = element_text(face = "bold"))+
   scale_x_continuous(breaks = c(1:21))+
   geom_text(data=totals, aes(x=UD.1920s, label= label_text, y = max), nudge_y=10, size =3)
 pdf_plot
