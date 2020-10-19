@@ -34,7 +34,7 @@ This code corresponds with the Technical Validation section in the Data Descript
 
 Please consider the following steps to run the code
 1. Create a new directory on your computer (e.g. "c:/building.schematic")
-2. Download the files from the [Github repository](https://github.com/ukral/building.registry) and save them in your new directory.
+2. Download the files from the [Github repository](https://github.com/ukral/building.schematic) and save them in your new directory.
 3. Copy the path of your new directory into the code at line 42.
 
 # Import datasets
