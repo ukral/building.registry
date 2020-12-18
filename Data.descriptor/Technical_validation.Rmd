@@ -21,7 +21,7 @@ library(dplyr)
 library(naniar)
 library(readxl)
 library(ggplot2)
-library(patchwork)
+#library(patchwork)
 library(splus2R)
 library(ggpubr)
 

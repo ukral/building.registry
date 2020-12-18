@@ -16,22 +16,22 @@ library(knitr)
 
 
 # Import dataset
-dataset <- read.table("Dataset.csv", sep = ";", header = TRUE, encoding="UTF-8", stringsAsFactors = F)
+dataset <- read.table("C:/Users/u.kral/ownCloud/03_TU Wien/Github/building.schematic/Dataset.csv", sep = ";", header = TRUE, encoding="UTF-8", stringsAsFactors = F)
 
 
 # Import tables and figures
-table1 <- read.table("Codebook_files/table_dataset.datafields.csv", sep = ";", header = TRUE, encoding="UTF-8")
+table1 <- read.table("table_dataset.datafields.csv", sep = ";", header = TRUE, encoding="UTF-8")
 colnames(table1) <- c("Field", "Name", "Name.analog", "Description", "Type")
 
-table_id <- read.table("Codebook_files/table_ID.csv", sep = ";", header = TRUE, encoding="UTF-8")
-table_STR.2010s <- read.table("Codebook_files/table_STR.2010s.csv", sep = ";", header = TRUE, encoding="UTF-8")
-table_POS.1920s <- read.table("Codebook_files/table_POS.1920s.csv", sep = ";", header = TRUE, encoding="UTF-8")
-table_FLOORS.1920s <- read.table("Codebook_files/table_FLOORS.1920s.csv", sep = ";", header = TRUE, encoding="UTF-8")
+table_id <- read.table("table_ID.csv", sep = ";", header = TRUE, encoding="UTF-8")
+table_STR.2010s <- read.table("table_STR.2010s.csv", sep = ";", header = TRUE, encoding="UTF-8")
+table_POS.1920s <- read.table("table_POS.1920s.csv", sep = ";", header = TRUE, encoding="UTF-8")
+table_FLOORS.1920s <- read.table("table_FLOORS.1920s.csv", sep = ";", header = TRUE, encoding="UTF-8")
 ```
 
 
 # Introduction
-This Codebook refers to the dataset [Building schematic of Vienna in the late 1920s](Dataset.csv), briefly called digital building schematic. The dataset includes `r nrow(dataset)` data entries (rows) and `r ncol(dataset)` data fields (columns).
+This Codebook refers to the dataset [Building schematic of Vienna in the late 1920s](https://github.com/ukral/building.schematic/blob/master/Dataset.csv), briefly called digital building schematic. The dataset includes `r nrow(dataset)` data entries (rows) and `r ncol(dataset)` data fields (columns).
 
 #	Dataset format
 The dataset has a CSV format. The data records are separated by semicolons (“;”). The decimal separator is a decimal point “.”. The Universal Coded Character Set (UCS) is UTF-8. 

@@ -22,8 +22,9 @@ Codebook
 # Introduction
 
 This Codebook refers to the dataset [Building schematic of Vienna in the
-late 1920s](Dataset.csv), briefly called digital building schematic. The
-dataset includes 42861 data entries (rows) and 12 data fields (columns).
+late 1920s](https://github.com/ukral/building.schematic/blob/master/Dataset.csv),
+briefly called digital building schematic. The dataset includes 42861
+data entries (rows) and 12 data fields (columns).
 
 # Dataset format
 
@@ -43,7 +44,7 @@ respectively.
 | :---------- | :-------------------- | :----------------------- | :---------------------------------------------------------------------------------------------- | :--- |
 | ID          | Identification number | \-                       | A unique number for each data entry.                                                            | SD   |
 | UD.1920s    | Urban district        | \-                       | The number of the city district in the late 1920s.                                              | SD   |
-| CC.2010s    | Cadastral community   | \-                       | The number of the cadastral community in in the late 2010s.                                     | SD   |
+| CC.2010s    | Cadastral community   | \-                       | The number of the cadastral community in the late 2010s.                                        | SD   |
 | STR.1920s   | Street name           | Gasse, Straße oder Platz | Name of alley, street, square in the late 1920s.                                                | OD   |
 | STR.2010s   | Street name           | \-                       | Name of alley, street, square in the late 2010s.                                                | SD   |
 | BN.1920s    | Building number       | Orientierungsnummer      | Street-based continuous numerating of buildings in the late 1920s.                              | OD   |
@@ -161,7 +162,7 @@ owner. Blank entries stand for “not available”.
 
 The field includes integers that stand for the page number in the
 scanned PDF version of the [analog building
-schematic](permalink.obvsg.at/wbr/AC07637508).
+schematic](https://permalink.obvsg.at/wbr/AC07637508).
 
 # Exemplary data records
 
